@@ -41,7 +41,35 @@ function isLastWeek(dateStr) {
   return date >= weekStart && date <= weekEnd;
 }
 
-export default function Home() {
+// Helper component: OverviewCard
+function OverviewCard({ title, value, icon, gradient, loading }) {
+  return (
+    <div className={`relative h-32 rounded-[28px] ${gradient} text-white overflow-hidden shadow-md`}>
+      {/* Folder Tab Glass Overlay */}
+      <div 
+        className="absolute inset-0 bg-white/10 backdrop-blur-md border border-white/10"
+        style={{ clipPath: "polygon(0 38%, 44% 38%, 52% 0, 100% 0, 100% 100%, 0 100%)" }}
+      />
+      
+      {/* Exposed Tab Area Content (Top Left) */}
+      <div className="absolute top-2.5 left-3.5 flex items-center gap-2">
+        <div className="flex h-7 w-7 items-center justify-center rounded-full bg-white/20 backdrop-blur-sm">
+          {icon}
+        </div>
+        <span className="text-[9px] font-extrabold uppercase tracking-wider opacity-90">{title}</span>
+      </div>
+
+      {/* Main Glass Content Area */}
+      <div className="absolute inset-x-0 bottom-0 h-[62%] px-4 pb-3.5 flex flex-col justify-end pointer-events-none">
+        <span className="text-lg font-black tracking-tight leading-none">
+          {loading ? "..." : value}
+        </span>
+      </div>
+    </div>
+  );
+}
+
+export default function Home({ onLogout }) {
   const [allExpenses, setAllExpenses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState("semua");
@@ -105,32 +133,35 @@ export default function Home() {
   const weekLabel = `${weekStart.toLocaleDateString("id-ID", { day: "numeric", month: "short" })} – ${weekEnd.toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "numeric" })}`;
 
   return (
-    <div className={`${geistSans.className} min-h-screen bg-zinc-50 font-sans text-zinc-900 dark:bg-zinc-950 dark:text-zinc-50`}>
+    <div className={`${geistSans.className} min-h-screen bg-zinc-50/50 font-sans text-zinc-900 dark:bg-zinc-950 dark:text-zinc-50 pb-12`}>
       {/* Navbar */}
-      <header className="border-b border-zinc-200/80 bg-white/80 backdrop-blur-md sticky top-0 z-10 dark:border-zinc-800/80 dark:bg-zinc-950/80">
+      <header className="border-b border-zinc-100 bg-white/80 backdrop-blur-md sticky top-0 z-10 dark:border-zinc-800/80 dark:bg-zinc-950/80">
         <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-4 sm:px-6">
           <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-gradient-to-tr from-indigo-500 to-violet-600 text-white shadow-md shadow-indigo-500/20">
-              <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-            </div>
+            <img
+              src="/profile.jpg"
+              alt="Profile"
+              className="h-12 w-12 rounded-full object-cover border border-zinc-200 shadow-sm"
+            />
             <div>
-              <h1 className="text-lg font-bold tracking-tight">Catatan Keuangan</h1>
+              <h1 className="text-sm font-extrabold tracking-tight text-zinc-900 dark:text-zinc-50">Selamat Pagi, Sindu</h1>
               <p className="text-[10px] text-zinc-500 dark:text-zinc-400">Minggu Ini · {weekLabel}</p>
             </div>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-3">
+            {/* Rekap Button */}
             <Link href="/rekap" legacyBehavior>
-              <a className="inline-flex items-center gap-1.5 rounded-xl border border-zinc-200 bg-white px-3 py-2.5 text-xs font-semibold text-zinc-700 transition-all hover:bg-zinc-50 active:scale-95 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-300">
-                <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <a className="inline-flex items-center gap-1.5 rounded-xl border border-zinc-200/80 bg-white px-3 py-2 text-xs font-semibold text-zinc-700 transition-all hover:bg-zinc-50 active:scale-95 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-300 cursor-pointer shadow-sm h-10">
+                <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                 </svg>
                 Rekap
               </a>
             </Link>
+
+            {/* Tambah Pengeluaran Button */}
             <Link href="/tambah" legacyBehavior>
-              <a className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-indigo-600 to-indigo-700 px-4 py-2.5 text-xs font-semibold text-white shadow-md shadow-indigo-600/10 transition-all hover:from-indigo-500 hover:to-indigo-600 active:scale-95">
+              <a className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-indigo-600 to-indigo-700 px-4 py-2 text-xs font-semibold text-white shadow-md shadow-indigo-600/10 transition-all hover:from-indigo-500 hover:to-indigo-600 active:scale-95 h-10">
                 <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                 </svg>
@@ -151,82 +182,76 @@ export default function Home() {
           </div>
         )}
 
-        {/* Kartu Ringkasan */}
-        <section className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-          {/* Total Minggu Ini */}
-          <div className="rounded-3xl border border-indigo-100 bg-gradient-to-br from-indigo-50 to-white p-6 shadow-sm dark:border-indigo-900/50 dark:from-indigo-950/30 dark:to-zinc-900">
-            <span className="text-xs font-semibold uppercase tracking-wider text-indigo-500 dark:text-indigo-400">
-              Total Minggu Ini
-            </span>
-            <div className="mt-2">
-              <span className="text-2xl font-extrabold tracking-tight text-zinc-900 dark:text-zinc-50 md:text-3xl">
-                {loading ? "..." : formatToRupiah(totalMingguIni)}
-              </span>
-            </div>
-            {!loading && (
-              <div className={`mt-3 flex items-center gap-1.5 text-xs font-medium ${selisih > 0 ? "text-rose-500" : selisih < 0 ? "text-emerald-500" : "text-zinc-400 dark:text-zinc-500"}`}>
-                {selisih > 0 ? (
-                  <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 15l7-7 7 7" /></svg>
-                ) : selisih < 0 ? (
-                  <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" /></svg>
-                ) : (
-                  <span className="inline-block h-2 w-2 rounded-full bg-zinc-400"></span>
-                )}
-                {selisih === 0
-                  ? "Sama dengan minggu lalu"
-                  : `${selisih > 0 ? "+" : ""}${formatToRupiah(Math.abs(selisih))} vs minggu lalu`}
-              </div>
-            )}
-          </div>
-
-          {/* Total Kebutuhan */}
-          <div className="rounded-3xl border border-zinc-200/80 bg-white p-6 shadow-sm dark:border-zinc-800/80 dark:bg-zinc-900">
-            <span className="text-xs font-semibold uppercase tracking-wider text-zinc-400 dark:text-zinc-500">Kebutuhan</span>
-            <div className="mt-2">
-              <span className="text-2xl font-extrabold tracking-tight text-emerald-600 dark:text-emerald-400 md:text-3xl">
-                {loading ? "..." : formatToRupiah(totalKebutuhan)}
-              </span>
-            </div>
-            <div className="mt-3 flex items-center gap-1.5 text-xs text-zinc-500 dark:text-zinc-400">
-              <span className="inline-block h-2 w-2 rounded-full bg-emerald-500"></span>
-              Primer & mendesak minggu ini
-            </div>
-          </div>
-
-          {/* Total Keinginan */}
-          <div className="rounded-3xl border border-zinc-200/80 bg-white p-6 shadow-sm dark:border-zinc-800/80 dark:bg-zinc-900">
-            <span className="text-xs font-semibold uppercase tracking-wider text-zinc-400 dark:text-zinc-500">Keinginan</span>
-            <div className="mt-2">
-              <span className="text-2xl font-extrabold tracking-tight text-indigo-600 dark:text-indigo-400 md:text-3xl">
-                {loading ? "..." : formatToRupiah(totalKeinginan)}
-              </span>
-            </div>
-            <div className="mt-3 flex items-center gap-1.5 text-xs text-zinc-500 dark:text-zinc-400">
-              <span className="inline-block h-2 w-2 rounded-full bg-indigo-500"></span>
-              Tersier & hiburan minggu ini
-            </div>
+        {/* Activity Overview Section */}
+        <section>
+          <h2 className="text-base font-extrabold tracking-tight text-zinc-900 dark:text-zinc-50">Activity Overview</h2>
+          <div className="mt-4 grid grid-cols-2 gap-4 md:grid-cols-4">
+            <OverviewCard
+              title="Total Pengeluaran"
+              value={formatToRupiah(totalMingguIni)}
+              gradient="bg-gradient-to-br from-purple-500 to-indigo-600 shadow-purple-500/10"
+              loading={loading}
+              icon={
+                <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              }
+            />
+            <OverviewCard
+              title="Kebutuhan"
+              value={formatToRupiah(totalKebutuhan)}
+              gradient="bg-gradient-to-br from-amber-500 to-orange-600 shadow-orange-500/10"
+              loading={loading}
+              icon={
+                <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.656 7.343A7.99 7.99 0 0120 13a7.99 7.99 0 01-2.343 5.657z" />
+                </svg>
+              }
+            />
+            <OverviewCard
+              title="Keinginan"
+              value={formatToRupiah(totalKeinginan)}
+              gradient="bg-gradient-to-br from-blue-500 to-cyan-600 shadow-blue-500/10"
+              loading={loading}
+              icon={
+                <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.907c.961 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.373-1.81.588-1.81h4.906a1 1 0 00.951-.69l1.519-4.674z" />
+                </svg>
+              }
+            />
+            <OverviewCard
+              title="Transaksi"
+              value={`${thisWeekExpenses.length} Transaksi`}
+              gradient="bg-gradient-to-br from-pink-500 to-rose-600 shadow-rose-500/10"
+              loading={loading}
+              icon={
+                <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+                </svg>
+              }
+            />
           </div>
         </section>
 
-        {/* Tabel Transaksi Minggu Ini */}
+        {/* Riwayat Pengeluaran (Daftar Transaksi) */}
         <section className="mt-8">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <h2 className="text-lg font-bold tracking-tight text-zinc-900 dark:text-zinc-50">Pengeluaran Minggu Ini</h2>
-              <p className="text-xs text-zinc-500 dark:text-zinc-400">{weekLabel} · Reset otomatis setiap Minggu 00:00</p>
+              <h2 className="text-base font-extrabold tracking-tight text-zinc-900 dark:text-zinc-50">Riwayat Pengeluaran</h2>
+              <p className="text-[10px] text-zinc-500 dark:text-zinc-400">Menampilkan pengeluaran dalam minggu ini</p>
             </div>
             {/* Filter Pills */}
-            <div className="flex items-center gap-1.5 self-start rounded-xl border border-zinc-200 bg-white p-1 dark:border-zinc-800 dark:bg-zinc-900 sm:self-center">
+            <div className="flex items-center gap-1.5 self-start rounded-full border border-zinc-200/80 bg-white p-1 dark:border-zinc-800 dark:bg-zinc-900 sm:self-center">
               {["semua", "kebutuhan", "keinginan"].map((f) => (
                 <button
                   key={f}
                   onClick={() => setFilter(f)}
-                  className={`rounded-lg px-3 py-1.5 text-xs font-medium capitalize transition-all ${
+                  className={`rounded-full px-3 py-1.5 text-xs font-semibold capitalize transition-all ${
                     filter === f
                       ? f === "semua" ? "bg-zinc-900 text-white dark:bg-zinc-50 dark:text-zinc-950 shadow-sm"
                       : f === "kebutuhan" ? "bg-emerald-500 text-white shadow-sm"
                       : "bg-indigo-500 text-white shadow-sm"
-                      : "text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"
+                      : "text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100 cursor-pointer"
                   }`}
                 >
                   {f.charAt(0).toUpperCase() + f.slice(1)}
@@ -235,67 +260,114 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="mt-4 overflow-hidden rounded-3xl border border-zinc-200 bg-white shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
+          <div className="mt-4">
             {loading ? (
               <div className="flex h-48 items-center justify-center">
                 <div className="h-8 w-8 animate-spin rounded-full border-4 border-indigo-500 border-t-transparent"></div>
               </div>
             ) : filteredExpenses.length === 0 ? (
-              <div className="flex flex-col items-center justify-center px-4 py-16 text-center">
-                <div className="flex h-16 w-16 items-center justify-center rounded-3xl bg-zinc-100 dark:bg-zinc-800">
-                  <svg className="h-8 w-8 text-zinc-400 dark:text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="flex flex-col items-center justify-center rounded-[28px] border border-zinc-200/60 bg-white px-4 py-12 text-center dark:border-zinc-800 dark:bg-zinc-900">
+                <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-zinc-100 dark:bg-zinc-800">
+                  <svg className="h-7 w-7 text-zinc-400 dark:text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                   </svg>
                 </div>
-                <h3 className="mt-4 text-base font-bold text-zinc-900 dark:text-zinc-50">Belum Ada Pengeluaran Minggu Ini</h3>
+                <h3 className="mt-4 text-sm font-bold text-zinc-900 dark:text-zinc-50">Belum Ada Pengeluaran</h3>
                 <p className="mt-1 max-w-xs text-xs text-zinc-400 dark:text-zinc-500">
                   {filter === "semua" ? "Minggu yang hemat! Mulai catat jika ada pengeluaran baru." : `Tidak ada pengeluaran "${filter}" minggu ini.`}
                 </p>
-                {filter === "semua" && (
-                  <Link href="/tambah" legacyBehavior>
-                    <a className="mt-5 inline-flex items-center gap-2 rounded-xl bg-indigo-50 px-4 py-2.5 text-xs font-semibold text-indigo-600 transition-all hover:bg-indigo-100 active:scale-95 dark:bg-indigo-950/40 dark:text-indigo-400">
-                      Catat Pengeluaran
-                    </a>
-                  </Link>
-                )}
               </div>
             ) : (
-              <div className="overflow-x-auto">
-                <table className="w-full text-left border-collapse">
-                  <thead>
-                    <tr className="border-b border-zinc-200 bg-zinc-50/50 text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:border-zinc-800 dark:bg-zinc-800/30 dark:text-zinc-400">
-                      <th className="px-6 py-4 text-center">No</th>
-                      <th className="px-6 py-4">Tanggal</th>
-                      <th className="px-6 py-4">Nama Barang</th>
-                      <th className="px-6 py-4 text-center">Kategori</th>
-                      <th className="px-6 py-4 text-right">Harga</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-zinc-200/80 dark:divide-zinc-800/80 text-sm">
-                    {filteredExpenses.map((item, index) => (
-                      <tr key={item.id || index} className="hover:bg-zinc-50/50 transition-colors dark:hover:bg-zinc-800/20">
-                        <td className="px-6 py-4 text-center font-medium text-zinc-400 dark:text-zinc-500">{item.no}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-xs text-zinc-600 dark:text-zinc-400">
-                          {new Date(item.tanggal + "T00:00:00").toLocaleDateString("id-ID", { weekday: "short", day: "numeric", month: "short" })}
-                        </td>
-                        <td className="px-6 py-4 font-semibold text-zinc-900 dark:text-zinc-50">{item.nama_barang}</td>
-                        <td className="px-6 py-4 text-center whitespace-nowrap">
-                          {item.kategori === "kebutuhan" ? (
-                            <span className="inline-flex items-center rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-medium text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-400">Kebutuhan</span>
+              <div className="space-y-3">
+                {filteredExpenses.map((item, index) => {
+                  const isKebutuhan = item.kategori === "kebutuhan";
+                  return (
+                    <div 
+                      key={item.id || index}
+                      className="flex items-center justify-between rounded-[22px] border border-zinc-200/60 bg-white p-4 shadow-sm hover:shadow-md transition-all dark:border-zinc-800 dark:bg-zinc-900"
+                    >
+                      <div className="flex items-center gap-3">
+                        {/* Icon Box */}
+                        <div className={`flex h-11 w-11 items-center justify-center rounded-xl ${
+                          isKebutuhan 
+                            ? "bg-emerald-50 text-emerald-600 dark:bg-emerald-950/30 dark:text-emerald-400" 
+                            : "bg-indigo-50 text-indigo-600 dark:bg-indigo-950/30 dark:text-indigo-400"
+                        }`}>
+                          {isKebutuhan ? (
+                            <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                            </svg>
                           ) : (
-                            <span className="inline-flex items-center rounded-full bg-indigo-50 px-2.5 py-1 text-xs font-medium text-indigo-700 dark:bg-indigo-950/30 dark:text-indigo-400">Keinginan</span>
+                            <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m0-12.728l.707.707m12.728 12.728l.707-.707M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
                           )}
-                        </td>
-                        <td className="px-6 py-4 text-right font-extrabold text-zinc-900 dark:text-zinc-50 whitespace-nowrap">
-                          {formatToRupiah(Number(item.harga))}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+                        </div>
+                        
+                        <div>
+                          <h3 className="text-xs font-bold text-zinc-900 dark:text-zinc-50">{item.nama_barang}</h3>
+                          <p className="text-[10px] text-zinc-400 dark:text-zinc-500 mt-0.5">
+                            {new Date(item.tanggal + "T00:00:00").toLocaleDateString("id-ID", { weekday: "short", day: "numeric", month: "short" })} · <span className="capitalize">{item.kategori}</span>
+                          </p>
+                        </div>
+                      </div>
+                      
+                      {/* Price Pill */}
+                      <div className={`rounded-full px-3 py-1.5 text-xs font-extrabold shadow-sm ${
+                        isKebutuhan 
+                          ? "bg-emerald-50 text-emerald-700 dark:bg-emerald-950/20 dark:text-emerald-400" 
+                          : "bg-indigo-50 text-indigo-700 dark:bg-indigo-950/20 dark:text-indigo-400"
+                      }`}>
+                        {formatToRupiah(Number(item.harga))}
+                      </div>
+                    </div>
+                  );
+                })}
+
+                {/* See All link */}
+                <div className="pt-2 text-center">
+                  <Link href="/rekap" legacyBehavior>
+                    <a className="inline-flex items-center gap-1 text-xs font-bold text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300">
+                      Lihat Semua Rekap
+                      <svg className="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
+                      </svg>
+                    </a>
+                  </Link>
+                </div>
               </div>
             )}
           </div>
+        </section>
+
+        {/* Logout (Bottom Card) */}
+        <section className="mt-8">
+          <button
+            onClick={onLogout}
+            className="w-full mt-3 flex items-center justify-between rounded-3xl border border-rose-200/80 bg-white p-6 shadow-sm hover:shadow-md transition-all dark:border-rose-900/30 dark:bg-zinc-900 group cursor-pointer relative overflow-hidden"
+          >
+            <div className="flex items-center gap-4 z-10">
+              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-tr from-rose-500 to-red-600 text-white shadow-md shadow-rose-500/20">
+                <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                </svg>
+              </div>
+              <div className="text-left">
+                <h3 className="text-sm font-bold text-zinc-900 dark:text-zinc-50 group-hover:text-rose-600 dark:group-hover:text-rose-400 transition-colors">
+                  Keluar dari Akun
+                </h3>
+                <p className="text-xs text-zinc-400 dark:text-zinc-500 mt-0.5">
+                  Kunci kembali aplikasi dan kembali ke halaman login.
+                </p>
+              </div>
+            </div>
+            
+            <div className="text-zinc-400 group-hover:text-rose-600 dark:group-hover:text-rose-400 transition-colors z-10">
+              <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </div>
+          </button>
         </section>
       </main>
     </div>

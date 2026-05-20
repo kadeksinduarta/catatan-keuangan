@@ -39,7 +39,40 @@ function isCurrentWeek(dateStr) {
   return getWeekKey(dateStr) === getWeekKey(new Date().toISOString().split("T")[0]);
 }
 
-export default function Rekap() {
+// Helper component: OverviewCard
+function OverviewCard({ title, value, icon, gradient, subtitle }) {
+  return (
+    <div className={`relative h-32 rounded-[28px] ${gradient} text-white overflow-hidden shadow-md`}>
+      {/* Folder Tab Glass Overlay */}
+      <div 
+        className="absolute inset-0 bg-white/10 backdrop-blur-md border border-white/10"
+        style={{ clipPath: "polygon(0 38%, 44% 38%, 52% 0, 100% 0, 100% 100%, 0 100%)" }}
+      />
+      
+      {/* Exposed Tab Area Content (Top Left) */}
+      <div className="absolute top-2.5 left-3.5 flex items-center gap-2">
+        <div className="flex h-7 w-7 items-center justify-center rounded-full bg-white/20 backdrop-blur-sm">
+          {icon}
+        </div>
+        <span className="text-[9px] font-extrabold uppercase tracking-wider opacity-90">{title}</span>
+      </div>
+
+      {/* Main Glass Content Area */}
+      <div className="absolute inset-x-0 bottom-0 h-[62%] px-4 pb-3.5 flex flex-col justify-end pointer-events-none">
+        <span className="text-lg font-black tracking-tight leading-none">
+          {value}
+        </span>
+        {subtitle && (
+          <span className="text-[10px] font-medium opacity-90 mt-1 truncate">
+            {subtitle}
+          </span>
+        )}
+      </div>
+    </div>
+  );
+}
+
+export default function Rekap({ onLogout }) {
   const [allExpenses, setAllExpenses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -93,22 +126,41 @@ export default function Rekap() {
   const maxTotal = highestWeek ? highestWeek.total : 1;
 
   return (
-    <div className={`${geistSans.className} min-h-screen bg-zinc-50 font-sans text-zinc-900 dark:bg-zinc-950 dark:text-zinc-50`}>
+    <div className={`${geistSans.className} min-h-screen bg-zinc-50/50 font-sans text-zinc-900 dark:bg-zinc-950 dark:text-zinc-50 pb-12`}>
       {/* Navbar */}
-      <header className="border-b border-zinc-200/80 bg-white/80 backdrop-blur-md sticky top-0 z-10 dark:border-zinc-800/80 dark:bg-zinc-950/80">
+      <header className="border-b border-zinc-100 bg-white/80 backdrop-blur-md sticky top-0 z-10 dark:border-zinc-800/80 dark:bg-zinc-950/80">
         <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-4 sm:px-6">
           <div className="flex items-center gap-3">
+            <img
+              src="/profile.jpg"
+              alt="Profile"
+              className="h-12 w-12 rounded-full object-cover border border-zinc-200 shadow-sm"
+            />
+            <div>
+              <h1 className="text-sm font-extrabold tracking-tight text-zinc-900 dark:text-zinc-50">Selamat Pagi, Sindu</h1>
+              <p className="text-[10px] text-zinc-500 dark:text-zinc-400">Rekapitulasi Mingguan</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-3">
+            {/* Dashboard Button */}
             <Link href="/" legacyBehavior>
-              <a className="flex h-10 w-10 items-center justify-center rounded-2xl bg-zinc-100 text-zinc-600 transition hover:bg-zinc-200 dark:bg-zinc-800 dark:text-zinc-400 dark:hover:bg-zinc-700">
-                <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              <a className="inline-flex items-center gap-1.5 rounded-xl border border-zinc-200/80 bg-white px-3 py-2 text-xs font-semibold text-zinc-700 transition-all hover:bg-zinc-50 active:scale-95 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-300 cursor-pointer shadow-sm h-10">
+                <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
                 </svg>
+                Dashboard
               </a>
             </Link>
-            <div>
-              <h1 className="text-lg font-bold tracking-tight">Rekapitulasi Mingguan</h1>
-              <p className="text-[10px] text-zinc-500 dark:text-zinc-400">Perbandingan pengeluaran antar minggu</p>
-            </div>
+
+            {/* Tambah Pengeluaran Button */}
+            <Link href="/tambah" legacyBehavior>
+              <a className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-indigo-600 to-indigo-700 px-4 py-2 text-xs font-semibold text-white shadow-md shadow-indigo-600/10 transition-all hover:from-indigo-500 hover:to-indigo-600 active:scale-95 h-10">
+                <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                </svg>
+                Tambah
+              </a>
+            </Link>
           </div>
         </div>
       </header>
@@ -141,41 +193,42 @@ export default function Rekap() {
           <>
             {/* Statistik Ringkasan */}
             <section className="grid grid-cols-1 gap-4 sm:grid-cols-3 mb-8">
-              {/* Grand Total */}
-              <div className="rounded-3xl border border-zinc-200/80 bg-white p-6 shadow-sm dark:border-zinc-800/80 dark:bg-zinc-900">
-                <span className="text-xs font-semibold uppercase tracking-wider text-zinc-400 dark:text-zinc-500">Total Semua Minggu</span>
-                <div className="mt-2">
-                  <span className="text-2xl font-extrabold tracking-tight text-zinc-900 dark:text-zinc-50">{formatToRupiah(grandTotal)}</span>
-                </div>
-                <div className="mt-3 text-xs text-zinc-500 dark:text-zinc-400">{weeks.length} minggu tercatat</div>
-              </div>
-
-              {/* Minggu Terboros */}
+              <OverviewCard
+                title="Total Semua Minggu"
+                value={formatToRupiah(grandTotal)}
+                gradient="bg-gradient-to-br from-purple-500 to-indigo-600 shadow-purple-500/10"
+                subtitle={`${weeks.length} minggu tercatat`}
+                icon={
+                  <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                  </svg>
+                }
+              />
               {highestWeek && (
-                <div className="rounded-3xl border border-rose-200/80 bg-gradient-to-br from-rose-50 to-white p-6 shadow-sm dark:border-rose-900/40 dark:from-rose-950/20 dark:to-zinc-900">
-                  <span className="text-xs font-semibold uppercase tracking-wider text-rose-500 dark:text-rose-400">
-                    <svg className="inline h-3.5 w-3.5 mr-1 -mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 15l7-7 7 7" /></svg>
-                    Pengeluaran Tertinggi
-                  </span>
-                  <div className="mt-2">
-                    <span className="text-xl font-extrabold tracking-tight text-rose-600 dark:text-rose-400">{formatToRupiah(highestWeek.total)}</span>
-                  </div>
-                  <div className="mt-3 text-xs text-zinc-500 dark:text-zinc-400">{highestWeek.label}</div>
-                </div>
+                <OverviewCard
+                  title="Pengeluaran Tertinggi"
+                  value={formatToRupiah(highestWeek.total)}
+                  gradient="bg-gradient-to-br from-rose-500 to-red-600 shadow-rose-500/10"
+                  subtitle={highestWeek.label}
+                  icon={
+                    <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 15l7-7 7 7" />
+                    </svg>
+                  }
+                />
               )}
-
-              {/* Minggu Terhemat */}
               {lowestWeek && (
-                <div className="rounded-3xl border border-emerald-200/80 bg-gradient-to-br from-emerald-50 to-white p-6 shadow-sm dark:border-emerald-900/40 dark:from-emerald-950/20 dark:to-zinc-900">
-                  <span className="text-xs font-semibold uppercase tracking-wider text-emerald-500 dark:text-emerald-400">
-                    <svg className="inline h-3.5 w-3.5 mr-1 -mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" /></svg>
-                    Pengeluaran Terendah
-                  </span>
-                  <div className="mt-2">
-                    <span className="text-xl font-extrabold tracking-tight text-emerald-600 dark:text-emerald-400">{formatToRupiah(lowestWeek.total)}</span>
-                  </div>
-                  <div className="mt-3 text-xs text-zinc-500 dark:text-zinc-400">{lowestWeek.label}</div>
-                </div>
+                <OverviewCard
+                  title="Pengeluaran Terendah"
+                  value={formatToRupiah(lowestWeek.total)}
+                  gradient="bg-gradient-to-br from-emerald-500 to-teal-600 shadow-emerald-500/10"
+                  subtitle={lowestWeek.label}
+                  icon={
+                    <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" />
+                    </svg>
+                  }
+                />
               )}
             </section>
 
@@ -193,14 +246,14 @@ export default function Rekap() {
                   return (
                     <div
                       key={week.key}
-                      className={`rounded-2xl border p-5 transition-all ${
+                      className={`rounded-[22px] border p-5 transition-all shadow-sm hover:shadow-md ${
                         week.isCurrent
                           ? "border-indigo-200 bg-indigo-50/30 dark:border-indigo-900/50 dark:bg-indigo-950/20"
                           : week === highestWeek
                           ? "border-rose-200/80 bg-rose-50/20 dark:border-rose-900/30 dark:bg-rose-950/10"
                           : week === lowestWeek
                           ? "border-emerald-200/80 bg-emerald-50/20 dark:border-emerald-900/30 dark:bg-emerald-950/10"
-                          : "border-zinc-200/80 bg-white dark:border-zinc-800/80 dark:bg-zinc-900"
+                          : "border-zinc-200/60 bg-white dark:border-zinc-800/80 dark:bg-zinc-900"
                       }`}
                     >
                       <div className="flex items-center justify-between mb-3">
@@ -216,7 +269,18 @@ export default function Rekap() {
                             <span className="rounded-full bg-emerald-500 px-2 py-0.5 text-[10px] font-semibold text-white">Terendah</span>
                           )}
                         </div>
-                        <span className="text-base font-extrabold text-zinc-900 dark:text-zinc-50">{formatToRupiah(week.total)}</span>
+                        {/* Price Pill */}
+                        <div className={`rounded-full px-3.5 py-1.5 text-xs font-extrabold shadow-sm ${
+                          week.isCurrent
+                            ? "bg-indigo-50 text-indigo-700 dark:bg-indigo-950/20 dark:text-indigo-400"
+                            : week === highestWeek
+                            ? "bg-rose-50 text-rose-700 dark:bg-rose-950/20 dark:text-rose-400"
+                            : week === lowestWeek
+                            ? "bg-emerald-50 text-emerald-700 dark:bg-emerald-950/20 dark:text-emerald-400"
+                            : "bg-zinc-100 text-zinc-800 dark:bg-zinc-800 dark:text-zinc-200"
+                        }`}>
+                          {formatToRupiah(week.total)}
+                        </div>
                       </div>
 
                       {/* Bar Progress */}
@@ -257,6 +321,29 @@ export default function Rekap() {
                 })}
               </div>
             </section>
+
+            {/* Logout Bottom Card */}
+            <button
+              onClick={onLogout}
+              className="mt-6 w-full flex items-center justify-between rounded-3xl border border-rose-200/80 bg-white p-6 shadow-sm hover:shadow-md transition-all dark:border-rose-900/30 dark:bg-zinc-900 group cursor-pointer"
+            >
+              <div className="flex items-center gap-4">
+                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-tr from-rose-500 to-red-600 text-white shadow-md shadow-rose-500/20">
+                  <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                  </svg>
+                </div>
+                <div className="text-left">
+                  <h3 className="text-sm font-bold text-zinc-900 dark:text-zinc-50 group-hover:text-rose-600 dark:group-hover:text-rose-400 transition-colors">Keluar dari Akun</h3>
+                  <p className="text-xs text-zinc-400 dark:text-zinc-500 mt-0.5">Kunci kembali aplikasi dan kembali ke halaman login.</p>
+                </div>
+              </div>
+              <div className="text-zinc-400 group-hover:text-rose-600 dark:group-hover:text-rose-400 transition-colors">
+                <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </div>
+            </button>
           </>
         )}
       </main>
